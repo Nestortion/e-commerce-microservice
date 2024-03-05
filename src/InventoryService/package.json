@@ -1,0 +1,13 @@
+{
+  "name": "inventoryservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "push": "drizzle-kit push:pg",
+    "dev": "tsx index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

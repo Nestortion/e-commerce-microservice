@@ -1,0 +1,44 @@
+syntax = "proto3";
+package inventory;
+
+service InventoryService{
+    rpc addToInventory(InventoryRequest) returns (InventoryResponse) {}
+    rpc updateInventory(UpdateRequest) returns (UpdateResponse){}
+}
+
+enum Status {
+    DEPLETED = 1;
+    WARNING = 2;
+    GOOD = 3;
+}
+
+enum UpdateType {
+    DECREASE = 1;
+    INCREASE = 2;
+}
+
+message InventoryData {
+    required int64 productId = 1;
+    required int64 quantity = 2;
+    required Status status = 3;
+    required string productUUID = 4;
+}
+
+message InventoryRequest {
+    required string productUUID = 1;
+}
+
+message InventoryResponse {
+    required string inventoryId = 1;
+    required InventoryData inventoryData = 2;
+}
+
+message UpdateRequest {
+    required UpdateType updateType = 1;
+    required string productUUID = 2;
+    required int64 productQuantity = 3;
+}
+
+message UpdateResponse{
+    required string message = 1;
+}

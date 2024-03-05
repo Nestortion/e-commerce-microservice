@@ -1,0 +1,29 @@
+syntax = "proto3";
+package order;
+
+service OrderService{
+    rpc createOrder(OrderRequest) returns(OrderResponse) {}
+}
+
+message Order{
+    required int64 orderId = 1;
+    required string orderUUID = 2;
+    required string customerUUID = 3;
+}
+
+message OrderDetails{
+    optional string orderUUID = 1;
+    required string productUUID = 2;
+    required int64 productPrice = 3;
+    required int64 productQuantity = 4;
+}
+
+message OrderRequest {
+    required string customerUUID = 1;
+    required OrderDetails orderDetails = 2;
+}
+
+message OrderResponse{
+    required Order order = 1;
+    required OrderDetails orderDetails = 2;
+}

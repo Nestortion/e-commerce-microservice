@@ -1,0 +1,50 @@
+import "google/protobuf/empty.proto";
+syntax = "proto3";
+
+package product;
+
+service ProductService {
+    rpc addProduct(ProductRequest) returns (ProductResponse){}
+    rpc viewProducts(ViewProductsRequest) returns(ProductList){}
+    rpc viewProductsById(ProductUUID) returns(ProductList) {}
+    rpc viewProductById(ProductUUID) returns(ViewProductByIdResponse) {}
+}
+
+message ViewProductByIdResponse{
+    required ProductData product = 1;
+    required int64 stocksLeft = 2;
+    required string stocksStatus = 3;
+}
+
+message ProductData {
+    required string productName = 1;
+    required string productDescription = 2;
+    required int64 productPrice = 3;
+    required string productUUID = 4;
+    required string productImage = 5;
+}
+
+message ProductRequest {
+    required string productName = 1;
+    required string productDescription = 2;
+    required int64 productPrice = 3;
+    required string productImage = 4;
+}
+
+message ProductResponse {
+    required int64 productId = 1;
+    required ProductData product = 2;
+    required string productUUID = 3;
+}
+
+message ProductList{
+    repeated ProductData productList = 1;
+}
+
+message ViewProductsRequest{
+    required int64 pageNum = 1;
+}
+
+message ProductUUID{
+    repeated string productUUID = 1;
+}
