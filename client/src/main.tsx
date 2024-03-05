@@ -10,7 +10,7 @@ import "./index.css";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import Login from "./pages/Login.tsx";
 import ProtectedRoute from "./pages/ProtectedRoute.tsx";
-import ProductPage from "./components/ProductPage.tsx";
+import ProductPage from "./pages/ProductPage.tsx";
 
 const router = createBrowserRouter([
   {

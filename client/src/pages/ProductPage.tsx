@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
-import { fontStyles } from "./ui/Font";
+import { fontStyles } from "../components/ui/Font";
 import { useState } from "react";
 import { FaPlus, FaMinus } from "react-icons/fa";
-import { buttonStyles } from "./ui/Button";
+import { buttonStyles } from "../components/ui/Button";
 import { TbTruckDelivery } from "react-icons/tb";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import AddToCart from "./AddToCart";
+import AddToCart from "../components/AddToCart";
 import { useQuery } from "@tanstack/react-query";
 
 type Product = {
@@ -35,14 +35,17 @@ function ProductPage() {
 
   return (
     <div className={`min-h-[85vh] flex justify-center items-center shadow-sm `}>
-      <div className="bg-zinc-100 w-[50%] h-[70vh] rounded-md">
+      <div className="bg-zinc-100 w-[50%] max-h-[70vh] rounded-md">
         {isSuccess && (
-          <div key={data.product.productUUID}>
-            <div className="flex p-5">
-              <div className=" flex-shrink-0 rounded-md overflow-hidden">
+          <div
+            className="flex flex-col gap-2 p-5"
+            key={data.product.productUUID}
+          >
+            <div className="flex">
+              <div className=" flex-shrink-0 rounded-md h-64 overflow-hidden">
                 <img
                   src={`http://localhost:5000/${data.product.productImage}`}
-                  className=" aspect-square w-64 object-cover"
+                  className=" aspect-square h-64 object-cover"
                 />
               </div>
 
@@ -130,16 +133,19 @@ function ProductPage() {
                   </div>
                 </div>
               </div>
-              <div
-                className={` h-80 flex flex-col justify-center ${fontStyles({
-                  intent: "ProductPage",
-                  class: "text-base",
-                })}`}
-              >
-                <div></div>
-              </div>
             </div>
-            <div className="w-full">{data.product.productDescription}</div>
+            <div
+              className={`indent-8 h-[35vh] w-full overflow-y-auto text-justify ${fontStyles(
+                { intent: "ProductPageDescription" }
+              )}`}
+            >
+              {data.product.productDescription.split("\n").map((par, index) => (
+                <p key={index}>
+                  {par}
+                  <br />
+                </p>
+              ))}
+            </div>
           </div>
         )}
       </div>
