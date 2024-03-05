@@ -11,6 +11,7 @@ export const fontStyles = cva([""], {
       CartHeader: "font-gudea text-lg",
       addProductLabel: "font inconsolata text-lg font-semibold text-cyan-400",
       ProductPage: "font-gudea font-semibold text-2xl text-black",
+      ProductPageDescription: "font-gudea font-semibold text-sm text-black",
     },
   },
 });
