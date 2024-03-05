@@ -34,8 +34,8 @@ function ProductPage() {
   });
 
   return (
-    <div className={`min-h-[85vh] flex justify-center items-center shadow-sm `}>
-      <div className="bg-zinc-100 w-[50%] max-h-[70vh] rounded-md">
+    <div className={`min-h-[85vh] flex justify-center items-center  `}>
+      <div className="bg-zinc-100 w-[50%] max-h-[70vh] rounded-md shadow-sm">
         {isSuccess && (
           <div
             className="flex flex-col gap-2 p-5"
