@@ -27,10 +27,9 @@ function CartItem({ product }: { product: Product }) {
 
   return (
     <div
-      className={`flex w-full py-1 ${fontStyles({
+      className={`flex w-full py-1 border-b-zinc-300 border-b-2 ${fontStyles({
         intent: "CartLabel",
       })} `}
-      key={product.productUUID}
     >
       <div className="flex gap-2 items-center">
         <div className="overflow-hidden rounded-md flex-1">

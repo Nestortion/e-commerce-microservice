@@ -60,7 +60,7 @@ function Cart() {
           <div className="w-full overflow-y-auto px-2 bg-zinc-100">
             {isSuccess &&
               data.productsInCart.map((product) => (
-                <CartItem product={product} />
+                <CartItem product={product} key={product.productUUID} />
               ))}
           </div>
 
