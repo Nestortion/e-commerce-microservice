@@ -15,16 +15,24 @@ function Footer() {
         NG Development
       </div>
       <div className="flex-1 flex justify-center items-center w-fit gap-2 text-cyan-400 text-xl">
-        <a href="https://www.facebook.com/Hakuryuukou/">
+        <a
+          href="https://www.facebook.com/Hakuryuukou/"
+          target="_blank"
+          rel="noreferrer"
+        >
           <FaFacebook />
         </a>
-        <a href="https://github.com/Nestortion">
+        <a
+          href="https://github.com/Nestortion"
+          target="_blank"
+          rel="noreferrer"
+        >
           <FaGithub />
         </a>
-        <a href="">
+        <a href="" target="_blank" rel="noreferrer">
           <FaYoutube />
         </a>
-        <a href="https://twitter.com/ylalet">
+        <a href="https://twitter.com/ylalet" target="_blank" rel="noreferrer">
           <FaTwitter />
         </a>
       </div>
