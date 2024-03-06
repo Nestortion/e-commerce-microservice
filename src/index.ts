@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import {
-  ProductList,
   ProductResponse,
   ViewProductByIdResponse,
 } from "./ProductService/product.pb.js";
@@ -104,13 +103,12 @@ app.get("/products/:pageNum", (req: Request, res: Response) => {
 });
 
 app.post("/addToCart", (req: Request, res: Response) => {
-  const { customerID, productUUID, productPrice, productQuantity } = req.body;
+  const { customerID, productUUID, productQuantity } = req.body;
 
   CartServiceClient.addToCart(
     {
       productUUID,
       customerID,
-      productPrice,
       productQuantity,
     },
     (err: Error, response: any) => {

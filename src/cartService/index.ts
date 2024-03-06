@@ -43,7 +43,7 @@ const checkCustomerCart = async (customerID: string): Promise<CustomerCart> => {
 };
 
 const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
-  const { productUUID, customerID } = request;
+  const { productUUID, customerID, productQuantity } = request;
 
   const customerCart = await checkCustomerCart(customerID);
 
@@ -62,6 +62,7 @@ const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
   await cartDB.insert(cartItems).values({
     cartUUID: customerCart.cartUUID,
     productUUID,
+    productQuantity,
   });
 
   ProductServiceClient.viewProductsById(
@@ -83,6 +84,7 @@ const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
           productUUID: response.productList[0].productUUID,
           productPrice: response.productList[0].productPrice,
           productImage: response.productList[0].productImage,
+          productQuantity,
         });
       } else {
         throw new Error("Response in undefined");

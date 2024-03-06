@@ -8,6 +8,7 @@ export type viewCart = (params: ViewCartRequest) => Promise<CurrentCart>;
 export interface CartRequest {
   productUUID: string;
   customerID: string;
+  productQuantity: number;
 }
 
 export interface Product {

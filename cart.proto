@@ -10,6 +10,7 @@ service CartService {
 message CartRequest {
     required string productUUID = 1;
     required string customerID = 2;
+    required int64 productQuantity = 3;
 }
 
 message Product {
