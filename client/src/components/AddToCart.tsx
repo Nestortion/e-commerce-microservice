@@ -3,10 +3,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { buttonStyles } from "./ui/Button";
 import { fontStyles } from "./ui/Font";
 import Swal from "sweetalert2";
+import { MouseEvent } from "react";
 
 type AddToCartPayload = {
   customerID: string;
   productUUID: string;
+  productQuantity: number;
 };
 
 type Product = {
@@ -16,7 +18,13 @@ type Product = {
   productUUID: string;
 };
 
-function AddToCart({ productUUID }: { productUUID: string }) {
+function AddToCart({
+  productUUID,
+  productQuantity,
+}: {
+  productUUID: string;
+  productQuantity?: number;
+}) {
   const { user } = useUser();
 
   const queryClient = useQueryClient();
@@ -32,9 +40,12 @@ function AddToCart({ productUUID }: { productUUID: string }) {
         body: JSON.stringify(payload),
       });
 
+      if (!response.ok) throw new Error(response.statusText);
+
       const addToCartData = (await response.json()) as Promise<{
         product: Product;
       }>;
+
       return addToCartData;
     },
     onSuccess: (data) => {
@@ -47,7 +58,7 @@ function AddToCart({ productUUID }: { productUUID: string }) {
     },
     onError: (error) => {
       Swal.fire({
-        title: error.name,
+        title: "Oh no!",
         text: error.message,
         icon: "error",
         cancelButtonText: "Continue",
@@ -55,8 +66,13 @@ function AddToCart({ productUUID }: { productUUID: string }) {
     },
   });
 
-  const handleAddToCart = () => {
-    addtoCartMutation.mutate({ customerID: user!.id, productUUID });
+  const handleAddToCart = (e: MouseEvent) => {
+    e.stopPropagation();
+    addtoCartMutation.mutate({
+      customerID: user!.id,
+      productUUID,
+      productQuantity: productQuantity ? productQuantity : 1,
+    });
     Swal.fire({
       title: "Hooray!",
       icon: "success",

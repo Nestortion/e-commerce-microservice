@@ -22,7 +22,7 @@ type Product = {
 
 function ProductPage() {
   const { productID } = useParams();
-  const [productQuantity, setProductQuantity] = useState<number>(0);
+  const [productQuantity, setProductQuantity] = useState<number>(1);
 
   const { data, isSuccess } = useQuery({
     queryKey: ["products", { productID }],
@@ -69,7 +69,7 @@ function ProductPage() {
                           <FaMinus
                             className="hover:cursor-pointer"
                             onClick={() => {
-                              if (productQuantity <= 0) return;
+                              if (productQuantity <= 1) return;
                               setProductQuantity(productQuantity - 1);
                             }}
                           />
@@ -92,7 +92,10 @@ function ProductPage() {
                         >
                           Buy Now
                         </div>
-                        <AddToCart productUUID={productID as string} />
+                        <AddToCart
+                          productUUID={productID as string}
+                          productQuantity={productQuantity}
+                        />
                       </div>
                     </div>
                   </div>
