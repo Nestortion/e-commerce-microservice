@@ -12,14 +12,14 @@ service ProductService {
 
 message ViewProductByIdResponse{
     required ProductData product = 1;
-    required int64 stocksLeft = 2;
+    required int32 stocksLeft = 2;
     required string stocksStatus = 3;
 }
 
 message ProductData {
     required string productName = 1;
     required string productDescription = 2;
-    required int64 productPrice = 3;
+    required int32 productPrice = 3;
     required string productUUID = 4;
     required string productImage = 5;
 }
@@ -27,12 +27,12 @@ message ProductData {
 message ProductRequest {
     required string productName = 1;
     required string productDescription = 2;
-    required int64 productPrice = 3;
+    required int32 productPrice = 3;
     required string productImage = 4;
 }
 
 message ProductResponse {
-    required int64 productId = 1;
+    required int32 productId = 1;
     required ProductData product = 2;
     required string productUUID = 3;
 }
@@ -42,7 +42,7 @@ message ProductList{
 }
 
 message ViewProductsRequest{
-    required int64 pageNum = 1;
+    required int32 pageNum = 1;
 }
 
 message ProductUUID{

@@ -6,7 +6,7 @@ service OrderService{
 }
 
 message Order{
-    required int64 orderId = 1;
+    required int32 orderId = 1;
     required string orderUUID = 2;
     required string customerUUID = 3;
 }
@@ -14,8 +14,8 @@ message Order{
 message OrderDetails{
     optional string orderUUID = 1;
     required string productUUID = 2;
-    required int64 productPrice = 3;
-    required int64 productQuantity = 4;
+    required int32 productPrice = 3;
+    required int32 productQuantity = 4;
 }
 
 message OrderRequest {
