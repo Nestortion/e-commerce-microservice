@@ -4,6 +4,7 @@ package cart;
 service CartService {
     rpc addToCart(CartRequest) returns (Product) {}
     rpc viewCart(ViewCartRequest) returns (CurrentCart){}
+    rpc removeCartItem(RemoveCartItemRequest) returns(RemoveCartItemResponse){}
 }
 
 
@@ -11,6 +12,15 @@ message CartRequest {
     required string productUUID = 1;
     required string customerID = 2;
     required int32 productQuantity = 3;
+}
+
+message RemoveCartItemRequest {
+    required string cartUUID = 1;
+    required string productUUID = 2;
+}
+
+message RemoveCartItemResponse {
+    required string productUUID = 1;
 }
 
 message Product {

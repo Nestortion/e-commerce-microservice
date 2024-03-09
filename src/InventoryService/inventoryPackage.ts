@@ -1,9 +1,10 @@
 import { loadSync } from "@grpc/proto-loader";
 import * as grpc from "@grpc/grpc-js";
+import { ProtoGrpcType } from "./proto/inventory";
 
-const protoPath = "inventory.proto";
+const protoPath = "/inventory.proto";
 
-export const packageDefinition = loadSync(protoPath, {
+export const packageDefinition = loadSync(__dirname + protoPath, {
   keepCase: true,
   longs: String,
   enums: String,
@@ -11,6 +12,7 @@ export const packageDefinition = loadSync(protoPath, {
   oneofs: true,
 });
 
-export const inventoryDescriptor =
-  grpc.loadPackageDefinition(packageDefinition);
+export const inventoryDescriptor = grpc.loadPackageDefinition(
+  packageDefinition
+) as unknown as ProtoGrpcType;
 export const inventoryPackage = inventoryDescriptor.inventory;

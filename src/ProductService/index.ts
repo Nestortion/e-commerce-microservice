@@ -3,17 +3,27 @@ import { productDB } from "./db.js";
 import { productTable } from "./productSchema.js";
 import { productPackage } from "./productPackage.js";
 import { InventoryServiceClient } from "../InventoryService/inventoryServiceClient.js";
-import {
-  GetProductInventoryResponse,
-  InventoryResponse,
-} from "../InventoryService/inventory.pb.js";
 import crypto from "crypto";
-import { ProductUUID, ViewProductsRequest } from "./product.pb.js";
+import { ViewProductsRequest__Output } from "./proto/product/ViewProductsRequest.js";
+import { ProductList__Output } from "./proto/product/ProductList.js";
+import {
+  ViewProductByIdResponse,
+  ViewProductByIdResponse__Output,
+} from "./proto/product/ViewProductByIdResponse.js";
+import { ProductServiceHandlers } from "./proto/product/ProductService.js";
+import { GetProductInventoryResponse__Output } from "../InventoryService/proto/inventory/GetProductInventoryResponse.js";
+import { ViewProductByIdRequest__Output } from "./proto/product/ViewProductByIdRequest.js";
+import { ViewProductsByIdRequest__Output } from "./proto/product/ViewProductsByIdRequest.js";
+import { ProductRequest__Output } from "./proto/product/ProductRequest.js";
+import { ProductResponse__Output } from "./proto/product/ProductResponse.js";
 
 const server = new grpc.Server();
 
-const viewProducts = async (call: any, callback: Function) => {
-  const { pageNum } = call.request as ViewProductsRequest;
+const viewProducts = async (
+  call: grpc.ServerUnaryCall<ViewProductsRequest__Output, ProductList__Output>,
+  callback: grpc.sendUnaryData<ProductList__Output>
+) => {
+  const { pageNum } = call.request;
 
   const productList = await productDB
     .select()
@@ -28,14 +38,20 @@ const viewProducts = async (call: any, callback: Function) => {
         productDescription: product.productDescription,
         productPrice: product.productPrice,
         productName: product.productName,
-        productImage: product.productImage,
+        productImage: product.productImage!,
       };
     }),
   });
 };
 
-const viewProductsById = async (call: any, callback: Function) => {
-  const { productUUID } = call.request as ProductUUID;
+const viewProductsById = async (
+  call: grpc.ServerUnaryCall<
+    ViewProductsByIdRequest__Output,
+    ProductList__Output
+  >,
+  callback: grpc.sendUnaryData<ProductList__Output>
+) => {
+  const { productUUID } = call.request;
 
   if (productUUID!.length > 0) {
     const products = await productDB.query.productTable.findMany({
@@ -50,7 +66,7 @@ const viewProductsById = async (call: any, callback: Function) => {
           productDescription: product.productDescription,
           productPrice: product.productPrice,
           productName: product.productName,
-          productImage: product.productImage,
+          productImage: product.productImage!,
         };
       }),
     });
@@ -61,33 +77,42 @@ const viewProductsById = async (call: any, callback: Function) => {
   }
 };
 
-const viewProductById = async (call: any, callback: Function) => {
-  const { productUUID } = call.request as ProductUUID;
+const viewProductById = async (
+  call: grpc.ServerUnaryCall<
+    ViewProductByIdRequest__Output,
+    ViewProductByIdResponse__Output
+  >,
+  callback: grpc.sendUnaryData<ViewProductByIdResponse>
+) => {
+  const { productUUID } = call.request;
 
   const targetProduct = await productDB.query.productTable.findFirst({
     //@ts-ignore
     where: (product, { eq }) =>
       //@ts-ignore
-      eq(product.productUUID, productUUID[0] as string[]),
+      eq(product.productUUID, productUUID),
   });
 
   InventoryServiceClient.getProductInventory(
     {
       productUUID,
     },
-    (err: Error, response: GetProductInventoryResponse) => {
+    (err, response) => {
       if (err) throw err;
 
       callback(null, {
         product: targetProduct,
-        stocksLeft: response.productQuantity,
-        stocksStatus: response.productStatus,
+        stocksLeft: response!.productQuantity,
+        stocksStatus: response!.productStatus,
       });
     }
   );
 };
 
-const addProduct = async (call: any, callback: Function) => {
+const addProduct = async (
+  call: grpc.ServerUnaryCall<ProductRequest__Output, ProductResponse__Output>,
+  callback: grpc.sendUnaryData<ProductResponse__Output>
+) => {
   const { productName, productDescription, productPrice, productImage } =
     call.request;
 
@@ -109,7 +134,7 @@ const addProduct = async (call: any, callback: Function) => {
     {
       productUUID: addedProduct[0].productUUID,
     },
-    (err: Error, response: InventoryResponse) => {
+    (err, response) => {
       if (err) throw err;
       console.log(response);
     }
@@ -121,13 +146,12 @@ const addProduct = async (call: any, callback: Function) => {
     productUUID,
   });
 };
-//@ts-ignore
 server.addService(productPackage.ProductService.service, {
   addProduct,
   viewProducts,
   viewProductsById,
   viewProductById,
-});
+} as ProductServiceHandlers);
 
 server.bindAsync(
   "localhost:5008",

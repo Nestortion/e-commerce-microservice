@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "push": "drizzle-kit push:pg",
-    "dev": "tsx index.ts"
+    "dev": "tsx index.ts",
+    "proto": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=proto/ cart.proto"
   },
   "keywords": [],
   "author": "",

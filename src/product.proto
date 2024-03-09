@@ -6,8 +6,8 @@ package product;
 service ProductService {
     rpc addProduct(ProductRequest) returns (ProductResponse){}
     rpc viewProducts(ViewProductsRequest) returns(ProductList){}
-    rpc viewProductsById(ProductUUID) returns(ProductList) {}
-    rpc viewProductById(ProductUUID) returns(ViewProductByIdResponse) {}
+    rpc viewProductsById(ViewProductsByIdRequest) returns(ProductList) {}
+    rpc viewProductById(ViewProductByIdRequest) returns(ViewProductByIdResponse) {}
 }
 
 message ViewProductByIdResponse{
@@ -45,6 +45,10 @@ message ViewProductsRequest{
     required int32 pageNum = 1;
 }
 
-message ProductUUID{
+message ViewProductsByIdRequest{
     repeated string productUUID = 1;
+}
+
+message ViewProductByIdRequest{
+    required string productUUID = 1;
 }

@@ -4,11 +4,23 @@ import { inventoryPackage } from "./inventoryPackage.js";
 import { inventory } from "./inventorySchema.js";
 import * as grpc from "@grpc/grpc-js";
 import crypto from "crypto";
-import { GetProductInventoryRequest } from "./inventory.pb.js";
+import { InventoryServiceHandlers } from "./proto/inventory/InventoryService.js";
+import { InventoryRequest__Output } from "./proto/inventory/InventoryRequest.js";
+import { InventoryResponse__Output } from "./proto/inventory/InventoryResponse.js";
+import { GetProductInventoryRequest__Output } from "./proto/inventory/GetProductInventoryRequest.js";
+import { GetProductInventoryResponse__Output } from "./proto/inventory/GetProductInventoryResponse.js";
+import { UpdateRequest__Output } from "./proto/inventory/UpdateRequest.js";
+import { UpdateResponse__Output } from "./proto/inventory/UpdateResponse.js";
 
 const server = new grpc.Server();
 
-const addToInventory = async (call: any, callback: Function) => {
+const addToInventory = async (
+  call: grpc.ServerUnaryCall<
+    InventoryRequest__Output,
+    InventoryResponse__Output
+  >,
+  callback: grpc.sendUnaryData<InventoryResponse__Output>
+) => {
   const { productUUID } = call.request;
   const inventoryUUID = crypto.randomUUID();
 
@@ -21,13 +33,23 @@ const addToInventory = async (call: any, callback: Function) => {
     .returning();
 
   callback(null, {
-    inventoryId: newInventory[0].inventoryId,
-    inventoryData: newInventory[0],
+    inventoryId: String(newInventory[0].inventoryId),
+    inventoryData: {
+      productUUID: newInventory[0].productUUID,
+      quantity: newInventory[0].quantity,
+      status: newInventory[0].status!,
+    },
   });
 };
 
-const getProductInventory = async (call: any, callback: Function) => {
-  const { productUUID } = call.request as GetProductInventoryRequest;
+const getProductInventory = async (
+  call: grpc.ServerUnaryCall<
+    GetProductInventoryRequest__Output,
+    GetProductInventoryResponse__Output
+  >,
+  callback: grpc.sendUnaryData<GetProductInventoryResponse__Output>
+) => {
+  const { productUUID } = call.request;
 
   const productInventory = await inventoryDB.query.inventory.findFirst({
     //@ts-ignore
@@ -35,12 +57,15 @@ const getProductInventory = async (call: any, callback: Function) => {
   });
 
   callback(null, {
-    productQuantity: productInventory?.quantity,
-    productStatus: productInventory?.status,
+    productQuantity: productInventory?.quantity!,
+    productStatus: productInventory?.status!,
   });
 };
 
-const updateInventory = async (call: any, callback: Function) => {
+const updateInventory = async (
+  call: grpc.ServerUnaryCall<UpdateRequest__Output, UpdateResponse__Output>,
+  callback: grpc.sendUnaryData<UpdateResponse__Output>
+) => {
   const { updateType, productUUID, productQuantity } = call.request;
 
   await inventoryDB
@@ -57,12 +82,11 @@ const updateInventory = async (call: any, callback: Function) => {
     message: `Successfully ${updateType}D productQuantity of productId:${productUUID} by ${productQuantity}`,
   });
 };
-//@ts-ignore
 server.addService(inventoryPackage.InventoryService.service, {
   addToInventory,
   updateInventory,
   getProductInventory,
-});
+} as InventoryServiceHandlers);
 
 server.bindAsync(
   "localhost:5009",

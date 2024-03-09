@@ -2,26 +2,24 @@ import * as grpc from "@grpc/grpc-js";
 import { cartPackage } from "./cartPackage.js";
 import { cartDB } from "./db.js";
 import { cart, cartItems } from "./cartSchema.js";
-import { CartRequest, Product, ViewCartRequest } from "./cart.pb.js";
+
 import { sql } from "drizzle-orm";
 import crypto from "crypto";
-import { ProductList } from "../ProductService/product.pb.js";
 import { ProductServiceClient } from "../ProductService/productServiceClient.js";
+import { CartServiceHandlers } from "./proto/cart/CartService.js";
+import { RemoveCartItemRequest } from "./proto/cart/RemoveCartItemRequest.js";
+import { RemoveCartItemResponse } from "./proto/cart/RemoveCartItemResponse.js";
+import { ViewCartRequest__Output } from "./proto/cart/ViewCartRequest.js";
+import { CurrentCart, CurrentCart__Output } from "./proto/cart/CurrentCart.js";
+import { CartRequest__Output } from "./proto/cart/CartRequest.js";
+import { Product__Output } from "./proto/cart/Product.js";
 
 const server = new grpc.Server();
 
-type AddToCartRequest = {
-  request: CartRequest;
-};
-
-type CheckCartRequest = {
-  request: ViewCartRequest;
-};
-
 type CustomerCart = {
-  customerID: string;
   cartID: number;
   cartUUID: string;
+  customerID: string;
 };
 
 const checkCustomerCart = async (customerID: string): Promise<CustomerCart> => {
@@ -42,8 +40,11 @@ const checkCustomerCart = async (customerID: string): Promise<CustomerCart> => {
   return customerCart[0];
 };
 
-const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
-  const { productUUID, customerID, productQuantity } = request;
+const addToCart = async (
+  call: grpc.ServerUnaryCall<CartRequest__Output, Product__Output>,
+  callback: grpc.sendUnaryData<Product__Output>
+) => {
+  const { productUUID, customerID, productQuantity } = call.request;
 
   const customerCart = await checkCustomerCart(customerID);
 
@@ -57,7 +58,11 @@ const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
       ),
   });
 
-  if (checkExisting) throw new Error("Product already in Cart!");
+  if (checkExisting)
+    callback({
+      code: grpc.status.ALREADY_EXISTS,
+      details: "Product Already in Cart!",
+    });
 
   await cartDB.insert(cartItems).values({
     cartUUID: customerCart.cartUUID,
@@ -69,7 +74,7 @@ const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
     {
       productUUID: [productUUID],
     },
-    (err: Error, response: ProductList) => {
+    (err, response) => {
       if (err) throw err;
 
       if (
@@ -93,8 +98,11 @@ const addToCart = async ({ request }: AddToCartRequest, callback: Function) => {
   );
 };
 
-const viewCart = async ({ request }: CheckCartRequest, callback: Function) => {
-  const { customerID } = request;
+const viewCart = async (
+  call: grpc.ServerUnaryCall<ViewCartRequest__Output, CurrentCart__Output>,
+  callback: grpc.sendUnaryData<CurrentCart>
+) => {
+  const { customerID } = call.request;
 
   const cart = await checkCustomerCart(customerID);
 
@@ -107,10 +115,10 @@ const viewCart = async ({ request }: CheckCartRequest, callback: Function) => {
     {
       productUUID: currentCartItems.map((cartItem) => cartItem.productUUID),
     },
-    (err: Error, response: ProductList) => {
+    (err, response) => {
       if (err) throw err;
 
-      const productsInCart = response.productList?.map((product) => {
+      const productsInCart = response!.productList?.map((product) => {
         const cartItem = currentCartItems.find(
           (cart) => cart.productUUID === product.productUUID
         );
@@ -127,11 +135,19 @@ const viewCart = async ({ request }: CheckCartRequest, callback: Function) => {
     }
   );
 };
-//@ts-ignore
-server.addService(cartPackage.CartService.service, {
+
+const removeCartItem = async (
+  call: grpc.ServerUnaryCall<RemoveCartItemRequest, RemoveCartItemResponse>,
+  callback: grpc.sendUnaryData<RemoveCartItemResponse>
+) => {
+  const {} = call.request;
+};
+
+server.addService(cartPackage.cart.CartService.service, {
   addToCart,
   viewCart,
-});
+  removeCartItem,
+} as CartServiceHandlers);
 
 server.bindAsync(
   "localhost:5011",

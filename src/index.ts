@@ -1,14 +1,10 @@
-import express, { Request, Response } from "express";
-import {
-  ProductResponse,
-  ViewProductByIdResponse,
-} from "./ProductService/product.pb.js";
+import express, { NextFunction, Request, Response } from "express";
 import { ProductServiceClient } from "./ProductService/productServiceClient.js";
-import { OrderServiceClient } from "./OrderService/orderServiceClient.js";
 import { CartServiceClient } from "./cartService/cartServiceClient.js";
 import fileUpload, { UploadedFile } from "express-fileupload";
 import cors from "cors";
 import path from "path";
+import { errorHandler } from "./Middleware/errorHandler.js";
 
 const port = 5000;
 
@@ -46,9 +42,9 @@ app.post("/addProduct", (req: Request, res: Response) => {
       productPrice,
       productImage: `${productName}.${productImage.mimetype.split("/")[1]}`,
     },
-    (err: Error, response: ProductResponse) => {
+    (err, response) => {
       if (err) throw err;
-      res.status(200).send(response.product);
+      return res.status(200).send(response!.product);
     }
   );
 });
@@ -59,50 +55,51 @@ app.get("/product/:productID", (req: Request, res: Response) => {
   try {
     ProductServiceClient.viewProductById(
       {
-        productUUID: [productID],
+        productUUID: productID,
       },
-      (err: Error, response: ViewProductByIdResponse) => {
+      (err, response) => {
         if (err) throw err;
-        res.status(200).send(response);
+        return res.status(200).send(response);
       }
     );
   } catch (error) {
-    res.status(500).send(error);
+    return res.status(500).send(error);
   }
 });
 
-app.post("/order", (req: Request, res: Response) => {
-  const { customerID, orderDetails } = req.body;
+// app.post("/order", (req: Request, res: Response) => {
+//   const { customerID, orderDetails } = req.body;
 
-  OrderServiceClient.createOrder(
-    {
-      customerID,
-      orderDetails,
-    },
-    (err: Error, response: any) => {
-      if (err) throw err;
-      console.log("order received");
-      res.status(200).send({
-        message: "order received",
-      });
-    }
-  );
-});
+//   OrderServiceClient.createOrder(
+//     {
+//       customerID,
+//       orderDetails,
+//     },
+//     (err, response) => {
+//       if (err) throw err;
+//       console.log("order received");
+//       return res.status(200).send({
+//         message: "order received",
+//       });
+//     }
+//   );
+// });
 
 app.get("/products/:pageNum", (req: Request, res: Response) => {
   const { pageNum } = req.params;
 
   ProductServiceClient.viewProducts(
     {
-      pageNum,
+      pageNum: parseInt(pageNum),
     },
-    (err: Error, response: any) => {
-      res.send(response);
+    (err, response) => {
+      if (err) throw err;
+      return res.send(response);
     }
   );
 });
 
-app.post("/addToCart", (req: Request, res: Response) => {
+app.post("/addToCart", (req: Request, res: Response, next: NextFunction) => {
   const { customerID, productUUID, productQuantity } = req.body;
 
   CartServiceClient.addToCart(
@@ -111,9 +108,14 @@ app.post("/addToCart", (req: Request, res: Response) => {
       customerID,
       productQuantity,
     },
-    (err: Error, response: any) => {
+    (err, response) => {
+      if (err) {
+        return next(err);
+      }
+
       console.log("product added to cart");
-      res.status(200).send({
+
+      return res.status(200).send({
         product: response,
       });
     }
@@ -126,12 +128,14 @@ app.get("/viewCart/:customerID", (req: Request, res: Response) => {
     {
       customerID,
     },
-    (err: Error, response: any) => {
+    (err, response) => {
       if (err) throw err;
-      res.status(200).send(response);
+      return res.status(200).send(response);
     }
   );
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`running on port ${port}`);
