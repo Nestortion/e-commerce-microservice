@@ -11,6 +11,7 @@ import ErrorPage from "./pages/ErrorPage.tsx";
 import Login from "./pages/Login.tsx";
 import ProtectedRoute from "./pages/ProtectedRoute.tsx";
 import ProductPage from "./pages/ProductPage.tsx";
+import CheckOutPage from "./pages/CheckOutPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
       {
         path: "/addProduct",
         element: <AddProduct />,
+      },
+      {
+        path: "/checkOut",
+        element: <CheckOutPage />,
       },
     ],
   },
