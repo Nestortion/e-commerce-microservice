@@ -184,7 +184,12 @@ const updateCartItemQuantity = async (
   const updatedCartItem = await cartDB
     .update(cartItems)
     .set({ productQuantity })
-    .where(eq(cartItems.cartUUID, customerCart!.cartUUID))
+    .where(
+      and(
+        eq(cartItems.cartUUID, customerCart!.cartUUID),
+        eq(cartItems.productUUID, productUUID)
+      )
+    )
     .returning();
 
   callback(null, {
