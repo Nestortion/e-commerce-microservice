@@ -3,16 +3,22 @@ import { cartPackage } from "./cartPackage.js";
 import { cartDB } from "./db.js";
 import { cart, cartItems } from "./cartSchema.js";
 
-import { sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import crypto from "crypto";
 import { ProductServiceClient } from "../ProductService/productServiceClient.js";
 import { CartServiceHandlers } from "./proto/cart/CartService.js";
-import { RemoveCartItemRequest } from "./proto/cart/RemoveCartItemRequest.js";
+import {
+  RemoveCartItemRequest,
+  RemoveCartItemRequest__Output,
+} from "./proto/cart/RemoveCartItemRequest.js";
 import { RemoveCartItemResponse } from "./proto/cart/RemoveCartItemResponse.js";
-import { ViewCartRequest__Output } from "./proto/cart/ViewCartRequest.js";
+import {
+  ViewCartRequest,
+  ViewCartRequest__Output,
+} from "./proto/cart/ViewCartRequest.js";
 import { CurrentCart, CurrentCart__Output } from "./proto/cart/CurrentCart.js";
 import { CartRequest__Output } from "./proto/cart/CartRequest.js";
-import { Product__Output } from "./proto/cart/Product.js";
+import { Product, Product__Output } from "./proto/cart/Product.js";
 
 const server = new grpc.Server();
 
@@ -49,11 +55,9 @@ const addToCart = async (
   const customerCart = await checkCustomerCart(customerID);
 
   const checkExisting = await cartDB.query.cartItems.findFirst({
-    where: (cartItems, { eq, and }) =>
+    where: (cartItems) =>
       and(
-        //@ts-ignore
         eq(cartItems.productUUID, productUUID),
-        //@ts-ignore
         eq(cartItems.cartUUID, customerCart.cartUUID)
       ),
   });
@@ -99,16 +103,14 @@ const addToCart = async (
 };
 
 const viewCart = async (
-  call: grpc.ServerUnaryCall<ViewCartRequest__Output, CurrentCart__Output>,
+  call: grpc.ServerUnaryCall<ViewCartRequest__Output, CurrentCart>,
   callback: grpc.sendUnaryData<CurrentCart>
 ) => {
   const { customerID } = call.request;
 
   const cart = await checkCustomerCart(customerID);
-
   const currentCartItems = await cartDB.query.cartItems.findMany({
-    //@ts-ignore
-    where: (cartItems, { eq }) => eq(cartItems.cartUUID, cart!.cartUUID),
+    where: (cartItems) => eq(cartItems.cartUUID, cart!.cartUUID),
   });
 
   ProductServiceClient.viewProductsById(
@@ -137,10 +139,31 @@ const viewCart = async (
 };
 
 const removeCartItem = async (
-  call: grpc.ServerUnaryCall<RemoveCartItemRequest, RemoveCartItemResponse>,
+  call: grpc.ServerUnaryCall<
+    RemoveCartItemRequest__Output,
+    RemoveCartItemResponse
+  >,
   callback: grpc.sendUnaryData<RemoveCartItemResponse>
 ) => {
-  const {} = call.request;
+  const { customerID, productUUID } = call.request;
+
+  const customerCart = await cartDB.query.cart.findFirst({
+    where: (cart) => eq(cart.customerID, customerID),
+  });
+
+  const removedCartItem = await cartDB
+    .delete(cartItems)
+    .where(
+      and(
+        eq(cartItems.cartUUID, customerCart!.cartUUID),
+        eq(cartItems.productUUID, productUUID)
+      )
+    )
+    .returning();
+
+  callback(null, {
+    productUUID: removedCartItem[0].productUUID,
+  });
 };
 
 server.addService(cartPackage.cart.CartService.service, {

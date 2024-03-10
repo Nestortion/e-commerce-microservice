@@ -5,7 +5,7 @@ import { createSelectSchema } from "drizzle-zod";
 export const cart = pgTable("carts", {
   cartID: serial("cart_id").primaryKey(),
   cartUUID: uuid("cart_uuid").notNull(),
-  customerID: text("customer_id").notNull(),
+  customerID: text("customer_id").notNull().unique(),
 });
 
 export const cartItems = pgTable("cart_items", {

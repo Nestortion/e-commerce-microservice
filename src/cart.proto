@@ -15,7 +15,7 @@ message CartRequest {
 }
 
 message RemoveCartItemRequest {
-    required string cartUUID = 1;
+    required string customerID = 1;
     required string productUUID = 2;
 }
 

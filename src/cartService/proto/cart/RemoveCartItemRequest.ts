@@ -2,11 +2,11 @@
 
 
 export interface RemoveCartItemRequest {
-  'cartUUID'?: (string);
+  'customerID'?: (string);
   'productUUID'?: (string);
 }
 
 export interface RemoveCartItemRequest__Output {
-  'cartUUID': (string);
+  'customerID': (string);
   'productUUID': (string);
 }

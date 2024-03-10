@@ -113,8 +113,6 @@ app.post("/addToCart", (req: Request, res: Response, next: NextFunction) => {
         return next(err);
       }
 
-      console.log("product added to cart");
-
       return res.status(200).send({
         product: response,
       });
@@ -124,6 +122,7 @@ app.post("/addToCart", (req: Request, res: Response, next: NextFunction) => {
 
 app.get("/viewCart/:customerID", (req: Request, res: Response) => {
   const { customerID } = req.params;
+
   CartServiceClient.viewCart(
     {
       customerID,
@@ -131,6 +130,24 @@ app.get("/viewCart/:customerID", (req: Request, res: Response) => {
     (err, response) => {
       if (err) throw err;
       return res.status(200).send(response);
+    }
+  );
+});
+
+app.delete("/cartItem", (req: Request, res: Response) => {
+  const { customerID, productUUID } = req.body;
+
+  CartServiceClient.removeCartItem(
+    {
+      customerID,
+      productUUID,
+    },
+    (err, response) => {
+      if (err) throw err;
+
+      return res.status(200).send({
+        productUUID: response!.productUUID,
+      });
     }
   );
 });
