@@ -7,6 +7,8 @@ import type { CurrentCart as _cart_CurrentCart, CurrentCart__Output as _cart_Cur
 import type { Product as _cart_Product, Product__Output as _cart_Product__Output } from '../cart/Product';
 import type { RemoveCartItemRequest as _cart_RemoveCartItemRequest, RemoveCartItemRequest__Output as _cart_RemoveCartItemRequest__Output } from '../cart/RemoveCartItemRequest';
 import type { RemoveCartItemResponse as _cart_RemoveCartItemResponse, RemoveCartItemResponse__Output as _cart_RemoveCartItemResponse__Output } from '../cart/RemoveCartItemResponse';
+import type { UpdateCartItemQuantityRequest as _cart_UpdateCartItemQuantityRequest, UpdateCartItemQuantityRequest__Output as _cart_UpdateCartItemQuantityRequest__Output } from '../cart/UpdateCartItemQuantityRequest';
+import type { UpdateCartItemQuantityResponse as _cart_UpdateCartItemQuantityResponse, UpdateCartItemQuantityResponse__Output as _cart_UpdateCartItemQuantityResponse__Output } from '../cart/UpdateCartItemQuantityResponse';
 import type { ViewCartRequest as _cart_ViewCartRequest, ViewCartRequest__Output as _cart_ViewCartRequest__Output } from '../cart/ViewCartRequest';
 
 export interface CartServiceClient extends grpc.Client {
@@ -28,6 +30,15 @@ export interface CartServiceClient extends grpc.Client {
   removeCartItem(argument: _cart_RemoveCartItemRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_RemoveCartItemResponse__Output>): grpc.ClientUnaryCall;
   removeCartItem(argument: _cart_RemoveCartItemRequest, callback: grpc.requestCallback<_cart_RemoveCartItemResponse__Output>): grpc.ClientUnaryCall;
   
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  updateCartItemQuantity(argument: _cart_UpdateCartItemQuantityRequest, callback: grpc.requestCallback<_cart_UpdateCartItemQuantityResponse__Output>): grpc.ClientUnaryCall;
+  
   viewCart(argument: _cart_ViewCartRequest, metadata: grpc.Metadata, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_CurrentCart__Output>): grpc.ClientUnaryCall;
   viewCart(argument: _cart_ViewCartRequest, metadata: grpc.Metadata, callback: grpc.requestCallback<_cart_CurrentCart__Output>): grpc.ClientUnaryCall;
   viewCart(argument: _cart_ViewCartRequest, options: grpc.CallOptions, callback: grpc.requestCallback<_cart_CurrentCart__Output>): grpc.ClientUnaryCall;
@@ -44,6 +55,8 @@ export interface CartServiceHandlers extends grpc.UntypedServiceImplementation {
   
   removeCartItem: grpc.handleUnaryCall<_cart_RemoveCartItemRequest__Output, _cart_RemoveCartItemResponse>;
   
+  updateCartItemQuantity: grpc.handleUnaryCall<_cart_UpdateCartItemQuantityRequest__Output, _cart_UpdateCartItemQuantityResponse>;
+  
   viewCart: grpc.handleUnaryCall<_cart_ViewCartRequest__Output, _cart_CurrentCart>;
   
 }
@@ -51,5 +64,6 @@ export interface CartServiceHandlers extends grpc.UntypedServiceImplementation {
 export interface CartServiceDefinition extends grpc.ServiceDefinition {
   addToCart: MethodDefinition<_cart_CartRequest, _cart_Product, _cart_CartRequest__Output, _cart_Product__Output>
   removeCartItem: MethodDefinition<_cart_RemoveCartItemRequest, _cart_RemoveCartItemResponse, _cart_RemoveCartItemRequest__Output, _cart_RemoveCartItemResponse__Output>
+  updateCartItemQuantity: MethodDefinition<_cart_UpdateCartItemQuantityRequest, _cart_UpdateCartItemQuantityResponse, _cart_UpdateCartItemQuantityRequest__Output, _cart_UpdateCartItemQuantityResponse__Output>
   viewCart: MethodDefinition<_cart_ViewCartRequest, _cart_CurrentCart, _cart_ViewCartRequest__Output, _cart_CurrentCart__Output>
 }

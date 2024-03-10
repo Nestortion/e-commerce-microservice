@@ -152,6 +152,22 @@ app.delete("/cartItem", (req: Request, res: Response) => {
   );
 });
 
+app.put("/cartItem", (req: Request, res: Response, next: NextFunction) => {
+  const { customerID, productUUID, productQuantity } = req.body;
+
+  CartServiceClient.updateCartItemQuantity(
+    {
+      customerID,
+      productQuantity,
+      productUUID,
+    },
+    (err, response) => {
+      if (err) return next(err);
+      return res.status(200).send(response);
+    }
+  );
+});
+
 app.use(errorHandler);
 
 app.listen(port, () => {

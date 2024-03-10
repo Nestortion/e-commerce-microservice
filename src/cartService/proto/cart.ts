@@ -15,6 +15,8 @@ export interface ProtoGrpcType {
     Product: MessageTypeDefinition
     RemoveCartItemRequest: MessageTypeDefinition
     RemoveCartItemResponse: MessageTypeDefinition
+    UpdateCartItemQuantityRequest: MessageTypeDefinition
+    UpdateCartItemQuantityResponse: MessageTypeDefinition
     ViewCartRequest: MessageTypeDefinition
   }
 }
