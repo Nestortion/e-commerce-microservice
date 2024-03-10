@@ -9,6 +9,7 @@ export const packageDefinition = loadSync(__dirname + protoPath, {
   longs: String,
   enums: String,
   defaults: true,
+  arrays: true,
   oneofs: true,
 });
 

@@ -10,6 +10,7 @@ export const packageDefinition = loadSync(__dirname + protoPath, {
   enums: String,
   defaults: true,
   oneofs: true,
+  arrays: true,
 });
 
 export const productDescriptor = grpc.loadPackageDefinition(

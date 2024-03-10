@@ -4,7 +4,14 @@ import { ProtoGrpcType } from "./proto/cart";
 
 const protoPath = "/cart.proto";
 
-export const packageDefinition = loadSync(__dirname + protoPath);
+export const packageDefinition = loadSync(__dirname + protoPath, {
+  keepCase: true,
+  longs: String,
+  enums: String,
+  defaults: true,
+  arrays: true,
+  oneofs: true,
+});
 
 export const cartDescriptor = grpc.loadPackageDefinition(
   packageDefinition

@@ -6,7 +6,7 @@
   "scripts": {
     "push": "drizzle-kit push:pg",
     "dev": "tsx index.ts",
-    "proto": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=proto/ product.proto"
+    "proto": "proto-loader-gen-types --longs=String --enums=String --defaults --oneofs --arrays --grpcLib=@grpc/grpc-js --outDir=proto/ product.proto"
   },
   "keywords": [],
   "author": "",
