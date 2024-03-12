@@ -1,58 +1,67 @@
 import * as grpc from "@grpc/grpc-js";
 import { orderPackage } from "./orderPackage.js";
 import { orderDB } from "./db.js";
-import { order, orderDetail } from "./orderSchema.js";
+import { order, orderItems } from "./orderSchema.js";
 import { InventoryServiceClient } from "../InventoryService/inventoryServiceClient.js";
-import { UpdateResponse } from "../InventoryService/inventory.pb.js";
-import { OrderDetails } from "./order.pb.js";
 import crypto from "crypto";
+import { OrderServiceHandlers } from "./proto/order/OrderService.js";
+import { CreateOrderRequest__Output } from "./proto/order/CreateOrderRequest.js";
+import { CreateOrderResponse__Output } from "./proto/order/CreateOrderResponse.js";
 
 const server = new grpc.Server();
 
-const createOrder = async (call: any, callback: Function) => {
-  const { customerUUID, orderDetails } = call.request;
+const createOrder = async (
+  call: grpc.ServerUnaryCall<
+    CreateOrderRequest__Output,
+    CreateOrderResponse__Output
+  >,
+  callback: grpc.sendUnaryData<CreateOrderResponse__Output>
+) => {
+  const { orderDetails, orderItems: orderItemsRequest } = call.request;
 
   const orderUUID = crypto.randomUUID();
 
-  const { productUUID, productPrice, productQuantity } =
-    orderDetails as OrderDetails;
+  if (orderDetails) {
+    const newOrder = await orderDB
+      .insert(order)
+      .values({
+        ...orderDetails,
+        orderUUID,
+      })
+      .returning();
 
-  const createdOrder = await orderDB
-    .insert(order)
-    .values({ customerUUID, orderUUID })
-    .returning();
+    const orderItemsValues = orderItemsRequest.map((orderItem) => {
+      return { ...orderItem, orderUUID };
+    });
 
-  const createdOrderDetails = await orderDB
-    .insert(orderDetail)
-    .values({
-      orderUUID: createdOrder[0].orderUUID,
-      productUUID,
-      productPrice,
-      productQuantity,
-    })
-    .returning();
+    const insertOrderItems = await orderDB
+      .insert(orderItems)
+      .values([...orderItemsValues])
+      .returning();
 
-  InventoryServiceClient.updateInventory(
-    {
-      updateType: "DECREASE",
-      productUUID,
-      productQuantity,
-    },
-    (err: Error, response: UpdateResponse) => {
-      if (err) throw err;
-      console.log(response);
-    }
-  );
+    InventoryServiceClient.updateInventory(
+      {
+        requestData: insertOrderItems.map((item) => {
+          return {
+            productQuantity: item.productQuantity,
+            productUUID: item.productUUID,
+          };
+        }),
+      },
+      (err, response) => {
+        if (err) throw err;
+        console.log(response);
+      }
+    );
 
-  callback(null, {
-    order: createdOrder[0],
-    orderDetails: createdOrderDetails[0],
-  });
+    callback(null, {
+      orderUUID: newOrder[0].orderUUID,
+    });
+  }
 };
-//@ts-ignore
 server.addService(orderPackage.OrderService.service, {
   createOrder,
-});
+} as OrderServiceHandlers);
 
 server.bindAsync(
   "localhost:5010",

@@ -2,28 +2,38 @@ syntax = "proto3";
 package order;
 
 service OrderService{
-    rpc createOrder(OrderRequest) returns(OrderResponse) {}
+    rpc createOrder(CreateOrderRequest) returns(CreateOrderResponse) {}
+}
+
+enum PaymentOption {
+    CARD = 1;
+    PAYPAY = 2;
+    GCASH = 3;
 }
 
 message Order{
-    required int32 orderId = 1;
-    required string orderUUID = 2;
-    required string customerUUID = 3;
+    required string customerID = 3;
+    required string customerName = 4;
+    required string email = 5;
+    required int32 phoneNumber = 6;
+    required string address = 7;
+    required string city = 8;
+    required int32 zipCode = 9;
+    required int32 totalPrice = 10;
+    required PaymentOption paymentOption = 11;
 }
 
-message OrderDetails{
-    optional string orderUUID = 1;
-    required string productUUID = 2;
+message OrderItem{
+    required string productUUID = 1;
+    required int32 productQuantity = 2;
     required int32 productPrice = 3;
-    required int32 productQuantity = 4;
 }
 
-message OrderRequest {
-    required string customerUUID = 1;
-    required OrderDetails orderDetails = 2;
+message CreateOrderRequest{
+    required Order orderDetails = 1;
+    repeated OrderItem orderItems = 2;
 }
 
-message OrderResponse{
-    required Order order = 1;
-    required OrderDetails orderDetails = 2;
+message CreateOrderResponse{
+    required string orderUUID = 1;
 }

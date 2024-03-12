@@ -5,6 +5,7 @@ import fileUpload, { UploadedFile } from "express-fileupload";
 import cors from "cors";
 import path from "path";
 import { errorHandler } from "./Middleware/errorHandler.js";
+import { OrderServiceClient } from "./OrderService/orderServiceClient.js";
 
 const port = 5000;
 
@@ -67,23 +68,21 @@ app.get("/product/:productID", (req: Request, res: Response) => {
   }
 });
 
-// app.post("/order", (req: Request, res: Response) => {
-//   const { customerID, orderDetails } = req.body;
+app.post("/order", (req: Request, res: Response) => {
+  const { orderDetails, orderItems } = req.body;
 
-//   OrderServiceClient.createOrder(
-//     {
-//       customerID,
-//       orderDetails,
-//     },
-//     (err, response) => {
-//       if (err) throw err;
-//       console.log("order received");
-//       return res.status(200).send({
-//         message: "order received",
-//       });
-//     }
-//   );
-// });
+  OrderServiceClient.createOrder(
+    {
+      orderItems,
+      orderDetails,
+    },
+    (err, response) => {
+      if (err) throw err;
+      console.log("order received");
+      return res.status(200).send(response);
+    }
+  );
+});
 
 app.get("/products/:pageNum", (req: Request, res: Response) => {
   const { pageNum } = req.params;

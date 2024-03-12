@@ -17,8 +17,8 @@ export interface ProtoGrpcType {
     InventoryService: SubtypeConstructor<typeof grpc.Client, _inventory_InventoryServiceClient> & { service: _inventory_InventoryServiceDefinition }
     Status: EnumTypeDefinition
     UpdateRequest: MessageTypeDefinition
+    UpdateRequestData: MessageTypeDefinition
     UpdateResponse: MessageTypeDefinition
-    UpdateType: EnumTypeDefinition
   }
 }
 

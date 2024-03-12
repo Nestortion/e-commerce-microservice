@@ -13,10 +13,6 @@ enum Status {
     GOOD = 3;
 }
 
-enum UpdateType {
-    DECREASE = 1;
-    INCREASE = 2;
-}
 
 message GetProductInventoryRequest {
     required string productUUID = 1;
@@ -43,10 +39,14 @@ message InventoryResponse {
     required InventoryData inventoryData = 2;
 }
 
-message UpdateRequest {
-    required UpdateType updateType = 1;
+message UpdateRequestData {
     required string productUUID = 2;
     required int32 productQuantity = 3;
+}
+
+
+message UpdateRequest {
+    repeated UpdateRequestData requestData = 1;
 }
 
 message UpdateResponse{

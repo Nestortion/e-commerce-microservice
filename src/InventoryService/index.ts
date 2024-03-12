@@ -66,20 +66,21 @@ const updateInventory = async (
   call: grpc.ServerUnaryCall<UpdateRequest__Output, UpdateResponse__Output>,
   callback: grpc.sendUnaryData<UpdateResponse__Output>
 ) => {
-  const { updateType, productUUID, productQuantity } = call.request;
+  const { requestData } = call.request;
 
-  await inventoryDB
-    .update(inventory)
-    .set({
-      quantity:
-        updateType === "DECREASE"
-          ? sql`${inventory.quantity} - ${productQuantity}`
-          : sql`${inventory.quantity} + ${productQuantity}`,
+  Promise.all(
+    requestData.map(async (data) => {
+      await inventoryDB
+        .update(inventory)
+        .set({
+          quantity: sql`${inventory.quantity} - ${data.productQuantity}`,
+        })
+        .where(eq(inventory.productUUID, data.productUUID));
     })
-    .where(eq(inventory.productUUID, productUUID));
+  );
 
   callback(null, {
-    message: `Successfully ${updateType}D productQuantity of productId:${productUUID} by ${productQuantity}`,
+    message: `Inventory Successfully Updated!`,
   });
 };
 server.addService(inventoryPackage.InventoryService.service, {
