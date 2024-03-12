@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { fontStyles } from "../components/ui/Font";
 import { useState } from "react";
 import { FaPlus, FaMinus } from "react-icons/fa";
@@ -6,7 +6,8 @@ import { buttonStyles } from "../components/ui/Button";
 import { TbTruckDelivery } from "react-icons/tb";
 import { IoShieldCheckmarkOutline } from "react-icons/io5";
 import AddToCart from "../components/AddToCart";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUser } from "@clerk/clerk-react";
 
 type Product = {
   product: {
@@ -20,9 +21,19 @@ type Product = {
   productStatus: string;
 };
 
+type AddToCartPayload = {
+  customerID: string;
+  productUUID: string;
+  productQuantity: number;
+};
+
 function ProductPage() {
   const { productID } = useParams();
+  const { user } = useUser();
   const [productQuantity, setProductQuantity] = useState<number>(1);
+  const queryClient = useQueryClient();
+
+  const navigate = useNavigate();
 
   const { data, isSuccess } = useQuery({
     queryKey: ["products", { productID }],
@@ -32,6 +43,44 @@ function ProductPage() {
       return res.json() as Promise<Product>;
     },
   });
+
+  const addtoCartMutation = useMutation({
+    mutationKey: ["addToCart"],
+    mutationFn: async (payload: AddToCartPayload) => {
+      const response = await fetch("http://localhost:5000/addToCart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error(response.statusText);
+
+      const addToCartData = (await response.json()) as Promise<{
+        product: Product;
+      }>;
+
+      return addToCartData;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ["cartItems", { customerID: user!.id }],
+        (oldData: { productsInCart: Array<Product> }) => {
+          return { productsInCart: [...oldData.productsInCart, data.product] };
+        }
+      );
+    },
+  });
+
+  const handleBuyNow = () => {
+    addtoCartMutation.mutate({
+      customerID: user!.id,
+      productQuantity,
+      productUUID: data!.product.productUUID,
+    });
+    navigate("/checkOut");
+  };
 
   return (
     <div className={`min-h-[85vh] flex justify-center items-center  `}>
@@ -89,6 +138,7 @@ function ProductPage() {
                           className={`${buttonStyles({
                             intent: "secondary",
                           })}} ${fontStyles({ intent: "Button" })}`}
+                          onClick={handleBuyNow}
                         >
                           Buy Now
                         </div>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FaCartShopping } from "react-icons/fa6";
 import { fontStyles } from "./ui/Font";
 import CartItem from "./CartItem";
+import { useNavigate } from "react-router-dom";
 
 type CurrentCart = {
   productsInCart: Array<{
@@ -18,7 +19,7 @@ type CurrentCart = {
 
 function Cart() {
   const { user } = useUser();
-
+  const navigate = useNavigate();
   const [showCart, setShowCart] = useState<boolean>(false);
 
   const { data, isSuccess } = useQuery({
@@ -31,6 +32,10 @@ function Cart() {
       return result.json() as Promise<CurrentCart>;
     },
   });
+
+  const handleProceedCheckOut = () => {
+    navigate("/checkOut");
+  };
 
   return (
     <div className="relative  hover:cursor-pointer h-full px-4 hover:bg-cyan-300 ease-in duration-300">
@@ -69,7 +74,7 @@ function Cart() {
               className={`bg-emerald-400 ${fontStyles({
                 intent: "Button",
               })}  p-2 rounded-md`}
-              onClick={() => {}}
+              onClick={handleProceedCheckOut}
             >
               Proceed to CheckOut
             </div>
