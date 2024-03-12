@@ -12,6 +12,7 @@ export interface Order {
   'zipCode'?: (number);
   'totalPrice'?: (number);
   'paymentOption'?: (_order_PaymentOption);
+  'sameBillAddress'?: (boolean);
 }
 
 export interface Order__Output {
@@ -24,4 +25,5 @@ export interface Order__Output {
   'zipCode': (number);
   'totalPrice': (number);
   'paymentOption': (_order_PaymentOption__Output);
+  'sameBillAddress': (boolean);
 }

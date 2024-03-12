@@ -21,6 +21,7 @@ message Order{
     required int32 zipCode = 9;
     required int32 totalPrice = 10;
     required PaymentOption paymentOption = 11;
+    required bool sameBillAddress = 12;
 }
 
 message OrderItem{

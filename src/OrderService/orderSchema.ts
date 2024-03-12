@@ -1,5 +1,11 @@
-import { pgEnum } from "drizzle-orm/pg-core";
-import { integer, pgTable, serial, uuid, text } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  serial,
+  uuid,
+  text,
+  boolean,
+} from "drizzle-orm/pg-core";
 
 export const order = pgTable("orders", {
   orderId: serial("order_id").primaryKey(),
@@ -13,6 +19,7 @@ export const order = pgTable("orders", {
   zipCode: integer("zip_code").notNull(),
   totalPrice: integer("total_price").notNull(),
   paymentOption: text("payment_option").notNull(),
+  sameBillAddress: boolean("same_billing_address").notNull().default(false),
 });
 
 export const orderItems = pgTable("order_items", {
