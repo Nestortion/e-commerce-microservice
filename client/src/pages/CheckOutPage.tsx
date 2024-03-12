@@ -1,6 +1,6 @@
 import { fontStyles } from "@/components/ui/Font";
 import { useUser } from "@clerk/clerk-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import gcashLogo from "../assets/gcash.svg";
 import { FaCreditCard, FaPaypal } from "react-icons/fa";
 import { buttonStyles } from "@/components/ui/Button";
@@ -57,7 +57,7 @@ type CreateOrderPayload = {
 
 function CheckOutPage() {
   const { user } = useUser();
-
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const [orderDetails, setOrderDetails] = useState<OrderDetails>({
@@ -102,6 +102,9 @@ function CheckOutPage() {
       return createOrderData;
     },
     onSuccess: (data) => {
+      queryClient.refetchQueries({
+        queryKey: ["cartItems", { customerID: user!.id }],
+      });
       Swal.fire({
         title: "Thank you for your order!",
         icon: "success",
