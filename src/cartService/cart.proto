@@ -6,6 +6,7 @@ service CartService {
     rpc viewCart(ViewCartRequest) returns (CurrentCart){}
     rpc removeCartItem(RemoveCartItemRequest) returns(RemoveCartItemResponse){}
     rpc updateCartItemQuantity(UpdateCartItemQuantityRequest) returns(UpdateCartItemQuantityResponse){}
+    rpc emptyCart(EmptyCartRequest) returns(EmptyCartResponse){}
 }
 
 
@@ -49,4 +50,12 @@ message CurrentCart{
 
 message ViewCartRequest {
     required string customerID = 1;
+}
+
+message EmptyCartRequest {
+    required string customerID = 1;
+}
+
+message EmptyCartResponse {
+    required string cartUUID = 1;
 }

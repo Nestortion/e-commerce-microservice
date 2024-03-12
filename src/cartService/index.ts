@@ -21,6 +21,8 @@ import { CartRequest__Output } from "./proto/cart/CartRequest.js";
 import { Product, Product__Output } from "./proto/cart/Product.js";
 import { UpdateCartItemQuantityRequest__Output } from "./proto/cart/UpdateCartItemQuantityRequest.js";
 import { UpdateCartItemQuantityResponse__Output } from "./proto/cart/UpdateCartItemQuantityResponse.js";
+import { EmptyCartRequest__Output } from "./proto/cart/EmptyCartRequest.js";
+import { EmptyCartResponse__Output } from "./proto/cart/EmptyCartResponse.js";
 
 const server = new grpc.Server();
 
@@ -198,11 +200,34 @@ const updateCartItemQuantity = async (
   });
 };
 
+const emptyCart = async (
+  call: grpc.ServerUnaryCall<
+    EmptyCartRequest__Output,
+    EmptyCartResponse__Output
+  >,
+  callback: grpc.sendUnaryData<EmptyCartResponse__Output>
+) => {
+  const { customerID } = call.request;
+
+  const customerCart = await cartDB.query.cart.findFirst({
+    where: (cart) => eq(cart.customerID, customerID),
+  });
+
+  await cartDB
+    .delete(cartItems)
+    .where(eq(cartItems.cartUUID, customerCart!.cartUUID));
+
+  callback(null, {
+    cartUUID: customerCart!.cartUUID,
+  });
+};
+
 server.addService(cartPackage.cart.CartService.service, {
   addToCart,
   viewCart,
   removeCartItem,
   updateCartItemQuantity,
+  emptyCart,
 } as CartServiceHandlers);
 
 server.bindAsync(

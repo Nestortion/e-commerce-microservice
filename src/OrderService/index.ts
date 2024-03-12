@@ -7,6 +7,7 @@ import crypto from "crypto";
 import { OrderServiceHandlers } from "./proto/order/OrderService.js";
 import { CreateOrderRequest__Output } from "./proto/order/CreateOrderRequest.js";
 import { CreateOrderResponse__Output } from "./proto/order/CreateOrderResponse.js";
+import { CartServiceClient } from "../cartService/cartServiceClient.js";
 
 const server = new grpc.Server();
 
@@ -50,6 +51,16 @@ const createOrder = async (
       },
       (err, response) => {
         if (err) throw err;
+      }
+    );
+
+    CartServiceClient.emptyCart(
+      {
+        customerID: orderDetails.customerID,
+      },
+      (err, response) => {
+        if (err) throw err;
+        console.log(`Emptied cart ${response?.cartUUID}`);
       }
     );
 
