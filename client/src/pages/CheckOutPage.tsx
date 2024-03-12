@@ -217,7 +217,7 @@ function CheckOutPage() {
         >
           1. Your Items
         </div>
-        <div className="flex flex-col gap-2 max-h-96  overflow-y-scroll">
+        <div className="flex flex-col gap-2 max-h-96  overflow-y-auto">
           {isSuccess &&
             data.productsInCart.map((product) => (
               <div
