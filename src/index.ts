@@ -78,7 +78,6 @@ app.post("/order", (req: Request, res: Response) => {
     },
     (err, response) => {
       if (err) throw err;
-      console.log("order received");
       return res.status(200).send(response);
     }
   );

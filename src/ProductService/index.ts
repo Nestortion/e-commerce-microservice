@@ -116,7 +116,6 @@ const addProduct = async (
   const { productName, productDescription, productPrice, productImage } =
     call.request;
 
-  console.log(productImage);
   const productUUID = crypto.randomUUID();
 
   const addedProduct = await productDB
@@ -136,7 +135,6 @@ const addProduct = async (
     },
     (err, response) => {
       if (err) throw err;
-      console.log(response);
     }
   );
 

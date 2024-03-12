@@ -50,7 +50,6 @@ const createOrder = async (
       },
       (err, response) => {
         if (err) throw err;
-        console.log(response);
       }
     );
 
