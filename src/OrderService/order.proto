@@ -26,7 +26,6 @@ message Order{
 message OrderItem{
     required string productUUID = 1;
     required int32 productQuantity = 2;
-    required int32 productPrice = 3;
 }
 
 message CreateOrderRequest{

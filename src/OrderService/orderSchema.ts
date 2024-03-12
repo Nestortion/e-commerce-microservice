@@ -18,6 +18,5 @@ export const order = pgTable("orders", {
 export const orderItems = pgTable("order_items", {
   orderUUID: uuid("order_uuid").notNull(),
   productUUID: uuid("product_uuid").notNull(),
-  productPrice: integer("product_price").notNull(),
   productQuantity: integer("product_quantity").notNull(),
 });
